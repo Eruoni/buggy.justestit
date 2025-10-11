@@ -1,0 +1,24 @@
+{
+  "name": "buggy.justestit",
+  "version": "1.0.0",
+  "description": "Playwright testing for the site",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js test",
+    "test:failed": "cucumber-js -p rerun @rerun.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@eruoni:Eruoni/buggy.justestit.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.2.0",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.1",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2"
+  }
+}
