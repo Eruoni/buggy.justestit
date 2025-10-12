@@ -4,8 +4,11 @@
   "description": "Playwright testing for the site",
   "main": "index.js",
   "scripts": {
-    "test": "cucumber-js test",
-    "test:failed": "cucumber-js -p rerun @rerun.txt"
+    "demo": "cucumber-js --tags \"@demo\"",
+    "test:failed": "cucumber-js -p rerun @rerun.txt",
+    "report:windows": "start test-results/cucumber-report.html",
+    "report:mac": "open test-results/cucumber-report.html"
+
   },
   "repository": {
     "type": "git",

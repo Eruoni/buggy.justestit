@@ -6,7 +6,7 @@
         "paths": [
             "src/test/features"
         ],
-        "dryRun": true,
+        "dryRun": false,
         "require": [
             "src/test/steps/*.ts",
             "src/hooks/hooks.ts"
@@ -21,13 +21,14 @@
             "rerun:@rerun.txt"
         ],
         "parallel": 1,
-        "retry": 1
+        "retry": 0,
+        "publishQuiet": true
     },
     "rerun": {
         "formatOptions": {
             "snippetInterface": "async-await"
         },
-        "dryRun": true,
+        "dryRun": false,
         "require": [
             "src/test/steps/*.ts",
             "src/hooks/hooks.ts"
@@ -41,6 +42,7 @@
             "json:test-results/cucumber-report.json",
             "rerun:@rerun.txt"
         ],
-        "parallel": 1
+        "parallel": 1,
+        "publishQuiet": true
     }
 }

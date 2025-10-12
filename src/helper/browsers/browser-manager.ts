@@ -79,3 +79,11 @@ export const getBrowser = (): Browser => {
 export const getBaseURL = (): string => {
     return process.env.BASE_URL || "https://buggy.justtestit.org";
 };
+
+export const getdefaultTimeout = (): number => {
+    return parseInt(process.env.TIMEOUT || "30000")
+};
+
+export const getdefaultShortTimeout = (): number => {
+    return parseInt(process.env.SHORT_TIMEOUT || "5000")
+};

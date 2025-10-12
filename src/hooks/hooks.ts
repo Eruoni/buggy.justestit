@@ -14,6 +14,11 @@ Before(async function () {
     await browserManager.createContext();
     page = await browserManager.createPage();
     this.page = page;
+
+    // Navigate to BASE_URL automatically
+    const baseURL = browserManager.getBaseURL();
+    console.log(`Navigating to: ${baseURL}`);
+    await page.goto(baseURL, { waitUntil: "domcontentloaded" });
 });
 
 After(async function ({ pickle, result }) {
@@ -26,6 +31,15 @@ After(async function ({ pickle, result }) {
     }
     
     console.log(`Scenario: ${pickle.name} - Status: ${result?.status}`);
+
+    // Close page and context after each scenario
+    if (page) {
+        await page.close();
+    }
+    const context = browserManager.getContext();
+    if (context) {
+        await context.close();
+    }
 });
 
 AfterAll(async function () {

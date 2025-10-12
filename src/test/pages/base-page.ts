@@ -10,6 +10,13 @@ export class BasePage {
     }
 
     /**
+     * Helper method to get locator from string or return existing locator
+     */
+    private getElementLocator(element: string | Locator): Locator {
+        return typeof element === "string" ? this.page.locator(element) : element;
+    }
+
+    /**
      * Navigate to a URL
      */
     async goto(url: string, timeout?: number): Promise<void> {
@@ -22,53 +29,33 @@ export class BasePage {
     /**
      * Click on an element
      */
-    async click(selector: string, timeout?: number): Promise<void> {
-        await this.page.click(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
-    }
-
-    /**
-     * Click on a locator
-     */
-    async clickLocator(locator: Locator, timeout?: number): Promise<void> {
-        await locator.click({ 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async click(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.click({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Double click on an element
      */
-    async doubleClick(selector: string, timeout?: number): Promise<void> {
-        await this.page.dblclick(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async doubleClick(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.dblclick({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Fill input field
      */
-    async fill(selector: string, text: string, timeout?: number): Promise<void> {
-        await this.page.fill(selector, text, { 
-            timeout: timeout || this.defaultTimeout 
-        });
-    }
-
-    /**
-     * Fill locator input field
-     */
-    async fillLocator(locator: Locator, text: string, timeout?: number): Promise<void> {
-        await locator.fill(text, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async fill(element: string | Locator, text: string, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.fill(text, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Type text with delay (simulates real typing)
      */
-    async type(selector: string, text: string, delay: number = 100, timeout?: number): Promise<void> {
-        await this.page.type(selector, text, { 
+    async type(element: string | Locator, text: string, delay: number = 100, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.pressSequentially(text, { 
             delay,
             timeout: timeout || this.defaultTimeout 
         });
@@ -77,61 +64,42 @@ export class BasePage {
     /**
      * Clear input field
      */
-    async clear(selector: string, timeout?: number): Promise<void> {
-        await this.page.fill(selector, "", { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async clear(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.clear({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Get text content of an element
      */
-    async getText(selector: string, timeout?: number): Promise<string> {
-        const element = await this.page.waitForSelector(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
-        return (await element?.textContent()) || "";
-    }
-
-    /**
-     * Get text content from a locator
-     */
-    async getTextFromLocator(locator: Locator, timeout?: number): Promise<string> {
-        return (await locator.textContent({ 
-            timeout: timeout || this.defaultTimeout 
-        })) || "";
+    async getText(element: string | Locator, timeout?: number): Promise<string> {
+        const locator = this.getElementLocator(element);
+        return (await locator.textContent({ timeout: timeout || this.defaultTimeout })) || "";
     }
 
     /**
      * Get attribute value
      */
-    async getAttribute(selector: string, attribute: string, timeout?: number): Promise<string | null> {
-        await this.page.waitForSelector(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
-        return await this.page.getAttribute(selector, attribute);
+    async getAttribute(element: string | Locator, attribute: string, timeout?: number): Promise<string | null> {
+        const locator = this.getElementLocator(element);
+        await locator.waitFor({ state: "attached", timeout: timeout || this.defaultTimeout });
+        return await locator.getAttribute(attribute);
+    }
+
+    /**
+     * Get input value
+     */
+    async getInputValue(element: string | Locator, timeout?: number): Promise<string> {
+        const locator = this.getElementLocator(element);
+        return await locator.inputValue({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Check if element is visible
      */
-    async isVisible(selector: string, timeout?: number): Promise<boolean> {
+    async isVisible(element: string | Locator, timeout?: number): Promise<boolean> {
         try {
-            await this.page.waitForSelector(selector, { 
-                state: "visible",
-                timeout: timeout || this.defaultTimeout 
-            });
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    /**
-     * Check if locator is visible
-     */
-    async isLocatorVisible(locator: Locator, timeout?: number): Promise<boolean> {
-        try {
+            const locator = this.getElementLocator(element);
             await locator.waitFor({ 
                 state: "visible",
                 timeout: timeout || this.defaultTimeout 
@@ -145,9 +113,10 @@ export class BasePage {
     /**
      * Check if element is hidden
      */
-    async isHidden(selector: string, timeout?: number): Promise<boolean> {
+    async isHidden(element: string | Locator, timeout?: number): Promise<boolean> {
         try {
-            await this.page.waitForSelector(selector, { 
+            const locator = this.getElementLocator(element);
+            await locator.waitFor({ 
                 state: "hidden",
                 timeout: timeout || this.defaultTimeout 
             });
@@ -160,44 +129,33 @@ export class BasePage {
     /**
      * Check if element is enabled
      */
-    async isEnabled(selector: string, timeout?: number): Promise<boolean> {
-        await this.page.waitForSelector(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
-        return await this.page.isEnabled(selector);
+    async isEnabled(element: string | Locator, timeout?: number): Promise<boolean> {
+        const locator = this.getElementLocator(element);
+        await locator.waitFor({ state: "attached", timeout: timeout || this.defaultTimeout });
+        return await locator.isEnabled();
     }
 
     /**
      * Check if element is disabled
      */
-    async isDisabled(selector: string, timeout?: number): Promise<boolean> {
-        return !(await this.isEnabled(selector, timeout));
+    async isDisabled(element: string | Locator, timeout?: number): Promise<boolean> {
+        return !(await this.isEnabled(element, timeout));
     }
 
     /**
      * Check if checkbox/radio is checked
      */
-    async isChecked(selector: string, timeout?: number): Promise<boolean> {
-        await this.page.waitForSelector(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
-        return await this.page.isChecked(selector);
+    async isChecked(element: string | Locator, timeout?: number): Promise<boolean> {
+        const locator = this.getElementLocator(element);
+        await locator.waitFor({ state: "attached", timeout: timeout || this.defaultTimeout });
+        return await locator.isChecked();
     }
 
     /**
      * Wait for element to be visible
      */
-    async waitForElement(selector: string, timeout?: number): Promise<void> {
-        await this.page.waitForSelector(selector, { 
-            state: "visible",
-            timeout: timeout || this.defaultTimeout 
-        });
-    }
-
-    /**
-     * Wait for locator to be visible
-     */
-    async waitForLocator(locator: Locator, timeout?: number): Promise<void> {
+    async waitForElement(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
         await locator.waitFor({ 
             state: "visible",
             timeout: timeout || this.defaultTimeout 
@@ -207,9 +165,21 @@ export class BasePage {
     /**
      * Wait for element to be hidden
      */
-    async waitForElementHidden(selector: string, timeout?: number): Promise<void> {
-        await this.page.waitForSelector(selector, { 
+    async waitForElementHidden(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.waitFor({ 
             state: "hidden",
+            timeout: timeout || this.defaultTimeout 
+        });
+    }
+
+    /**
+     * Wait for element to be attached
+     */
+    async waitForElementAttached(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.waitFor({ 
+            state: "attached",
             timeout: timeout || this.defaultTimeout 
         });
     }
@@ -242,55 +212,49 @@ export class BasePage {
     /**
      * Select option from dropdown by value
      */
-    async selectByValue(selector: string, value: string, timeout?: number): Promise<void> {
-        await this.page.selectOption(selector, { value }, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async selectByValue(element: string | Locator, value: string, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.selectOption({ value }, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Select option from dropdown by label
      */
-    async selectByLabel(selector: string, label: string, timeout?: number): Promise<void> {
-        await this.page.selectOption(selector, { label }, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async selectByLabel(element: string | Locator, label: string, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.selectOption({ label }, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Select option from dropdown by index
      */
-    async selectByIndex(selector: string, index: number, timeout?: number): Promise<void> {
-        await this.page.selectOption(selector, { index }, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async selectByIndex(element: string | Locator, index: number, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.selectOption({ index }, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Hover over an element
      */
-    async hover(selector: string, timeout?: number): Promise<void> {
-        await this.page.hover(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async hover(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.hover({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Focus on an element
      */
-    async focus(selector: string, timeout?: number): Promise<void> {
-        await this.page.focus(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async focus(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.focus({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
-     * Press a key
+     * Press a key on an element
      */
-    async press(selector: string, key: string, timeout?: number): Promise<void> {
-        await this.page.press(selector, key, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async press(element: string | Locator, key: string, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.press(key, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
@@ -355,45 +319,58 @@ export class BasePage {
     /**
      * Get element count
      */
-    async getElementCount(selector: string): Promise<number> {
-        return await this.page.locator(selector).count();
+    async getElementCount(element: string | Locator): Promise<number> {
+        const locator = this.getElementLocator(element);
+        return await locator.count();
     }
 
     /**
      * Get all text contents
      */
-    async getAllTexts(selector: string, timeout?: number): Promise<string[]> {
-        await this.page.waitForSelector(selector, { 
+    async getAllTexts(element: string | Locator, timeout?: number): Promise<string[]> {
+        const locator = this.getElementLocator(element);
+        await locator.first().waitFor({ 
+            state: "attached",
             timeout: timeout || this.defaultTimeout 
         });
-        return await this.page.locator(selector).allTextContents();
+        return await locator.allTextContents();
+    }
+
+    /**
+     * Get all inner texts
+     */
+    async getAllInnerTexts(element: string | Locator, timeout?: number): Promise<string[]> {
+        const locator = this.getElementLocator(element);
+        await locator.first().waitFor({ 
+            state: "attached",
+            timeout: timeout || this.defaultTimeout 
+        });
+        return await locator.allInnerTexts();
     }
 
     /**
      * Check element
      */
-    async check(selector: string, timeout?: number): Promise<void> {
-        await this.page.check(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async check(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.check({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Uncheck element
      */
-    async uncheck(selector: string, timeout?: number): Promise<void> {
-        await this.page.uncheck(selector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async uncheck(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.uncheck({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Drag and drop
      */
-    async dragAndDrop(sourceSelector: string, targetSelector: string, timeout?: number): Promise<void> {
-        await this.page.dragAndDrop(sourceSelector, targetSelector, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async dragAndDrop(source: string | Locator, target: string | Locator, timeout?: number): Promise<void> {
+        const sourceLocator = this.getElementLocator(source);
+        const targetLocator = this.getElementLocator(target);
+        await sourceLocator.dragTo(targetLocator, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
@@ -406,10 +383,9 @@ export class BasePage {
     /**
      * Scroll to element
      */
-    async scrollToElement(selector: string, timeout?: number): Promise<void> {
-        await this.page.locator(selector).scrollIntoViewIfNeeded({ 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async scrollToElement(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.scrollIntoViewIfNeeded({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
@@ -459,10 +435,9 @@ export class BasePage {
     /**
      * Upload file
      */
-    async uploadFile(selector: string, filePath: string | string[], timeout?: number): Promise<void> {
-        await this.page.setInputFiles(selector, filePath, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async uploadFile(element: string | Locator, filePath: string | string[], timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await locator.setInputFiles(filePath, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
@@ -473,56 +448,270 @@ export class BasePage {
     }
 
     /**
-     * Assertions - Expect element to be visible
+     * Get element by text (exact match)
      */
-    async expectToBeVisible(selector: string, timeout?: number): Promise<void> {
-        await expect(this.page.locator(selector)).toBeVisible({ 
-            timeout: timeout || this.defaultTimeout 
-        });
+    getByText(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByText(text, options);
     }
 
     /**
-     * Assertions - Expect locator to be visible
+     * Get element by role
      */
-    async expectLocatorToBeVisible(locator: Locator, timeout?: number): Promise<void> {
-        await expect(locator).toBeVisible({ 
-            timeout: timeout || this.defaultTimeout 
-        });
+    getByRole(role: "button" | "link" | "textbox" | "checkbox" | "radio" | "heading" | "img" | "listitem" | "table" | "cell" | "row" | "columnheader" | "list" | "navigation" | "main" | "banner" | "contentinfo" | "complementary" | "form" | "search" | "region" | "article" | "dialog" | "alert" | "alertdialog" | "menu" | "menuitem" | "tab" | "tabpanel" | "tooltip" | "status" | "progressbar" | "slider" | "spinbutton" | "switch" | "combobox" | "grid" | "gridcell" | "rowgroup" | "rowheader" | "separator" | "toolbar" | "tree" | "treeitem", options?: { name?: string | RegExp; exact?: boolean; checked?: boolean; disabled?: boolean; expanded?: boolean; level?: number; pressed?: boolean; selected?: boolean }): Locator {
+        return this.page.getByRole(role, options);
+    }
+
+    /**
+     * Get element by label
+     */
+    getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByLabel(text, options);
+    }
+
+    /**
+     * Get element by placeholder
+     */
+    getByPlaceholder(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByPlaceholder(text, options);
+    }
+
+    /**
+     * Get element by alt text
+     */
+    getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByAltText(text, options);
+    }
+
+    /**
+     * Get element by title
+     */
+    getByTitle(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByTitle(text, options);
+    }
+
+    /**
+     * Get element by test id
+     */
+    getByTestId(testId: string | RegExp): Locator {
+        return this.page.getByTestId(testId);
+    }
+
+    /**
+     * Get button by text
+     */
+    getButtonByText(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByRole("button", { name: text, ...options });
+    }
+
+    /**
+     * Get link by text
+     */
+    getLinkByText(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByRole("link", { name: text, ...options });
+    }
+
+    /**
+     * Get heading by text
+     */
+    getHeadingByText(text: string | RegExp, options?: { exact?: boolean; level?: number }): Locator {
+        return this.page.getByRole("heading", { name: text, ...options });
+    }
+
+    /**
+     * Get textbox by label or placeholder
+     */
+    getTextbox(text: string | RegExp, options?: { exact?: boolean }): Locator {
+        return this.page.getByRole("textbox", { name: text, ...options });
+    }
+
+    /**
+     * Get checkbox by label
+     */
+    getCheckbox(text: string | RegExp, options?: { exact?: boolean; checked?: boolean }): Locator {
+        return this.page.getByRole("checkbox", { name: text, ...options });
+    }
+
+    /**
+     * Get radio button by label
+     */
+    getRadio(text: string | RegExp, options?: { exact?: boolean; checked?: boolean }): Locator {
+        return this.page.getByRole("radio", { name: text, ...options });
+    }
+
+    /**
+     * Get element containing text (partial match)
+     */
+    getElementContainingText(text: string): Locator {
+        return this.page.locator(`text=${text}`);
+    }
+
+    /**
+     * Get element with exact text
+     */
+    getElementWithExactText(text: string): Locator {
+        return this.page.locator(`text="${text}"`);
+    }
+
+    /**
+     * Get element by CSS selector containing text
+     */
+    getElementByCssAndText(selector: string, text: string | RegExp): Locator {
+        return this.page.locator(selector).filter({ hasText: text });
+    }
+
+    /**
+     * Get parent element
+     */
+    getParent(element: string | Locator): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.locator("..");
+    }
+
+    /**
+     * Get child elements
+     */
+    getChildren(element: string | Locator, childSelector: string): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.locator(childSelector);
+    }
+
+    /**
+     * Get sibling element
+     */
+    getSibling(element: string | Locator, siblingSelector: string): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.locator(`~ ${siblingSelector}`);
+    }
+
+    /**
+     * Get nth element from locator
+     */
+    getNthElement(element: string | Locator, index: number): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.nth(index);
+    }
+
+    /**
+     * Get first element
+     */
+    getFirstElement(element: string | Locator): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.first();
+    }
+
+    /**
+     * Get last element
+     */
+    getLastElement(element: string | Locator): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.last();
+    }
+
+    /**
+     * Filter locator by text
+     */
+    filterByText(element: string | Locator, text: string | RegExp): Locator {
+        const locator = this.getElementLocator(element);
+        return locator.filter({ hasText: text });
+    }
+
+    /**
+     * Assertions - Expect element to be visible
+     */
+    async expectToBeVisible(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toBeVisible({ timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect element to be hidden
+     */
+    async expectToBeHidden(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toBeHidden({ timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect element to be enabled
+     */
+    async expectToBeEnabled(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toBeEnabled({ timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect element to be disabled
+     */
+    async expectToBeDisabled(element: string | Locator, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toBeDisabled({ timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Assertions - Expect element to have text
      */
-    async expectToHaveText(selector: string, text: string | RegExp, timeout?: number): Promise<void> {
-        await expect(this.page.locator(selector)).toHaveText(text, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async expectToHaveText(element: string | Locator, text: string | RegExp, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toHaveText(text, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Assertions - Expect element to contain text
      */
-    async expectToContainText(selector: string, text: string, timeout?: number): Promise<void> {
-        await expect(this.page.locator(selector)).toContainText(text, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+    async expectToContainText(element: string | Locator, text: string | RegExp, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toContainText(text, { timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect element to have value
+     */
+    async expectToHaveValue(element: string | Locator, value: string | RegExp, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toHaveValue(value, { timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect element to have attribute
+     */
+    async expectToHaveAttribute(element: string | Locator, name: string, value: string | RegExp, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toHaveAttribute(name, value, { timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect element to have count
+     */
+    async expectToHaveCount(element: string | Locator, count: number, timeout?: number): Promise<void> {
+        const locator = this.getElementLocator(element);
+        await expect(locator).toHaveCount(count, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Assertions - Expect URL to be
      */
     async expectURLToBe(url: string | RegExp, timeout?: number): Promise<void> {
-        await expect(this.page).toHaveURL(url, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+        await expect(this.page).toHaveURL(url, { timeout: timeout || this.defaultTimeout });
     }
 
     /**
      * Assertions - Expect title to be
      */
     async expectTitleToBe(title: string | RegExp, timeout?: number): Promise<void> {
-        await expect(this.page).toHaveTitle(title, { 
-            timeout: timeout || this.defaultTimeout 
-        });
+        await expect(this.page).toHaveTitle(title, { timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect URL to contain
+     */
+    async expectURLToContain(text: string, timeout?: number): Promise<void> {
+        await expect(this.page).toHaveURL(new RegExp(text), { timeout: timeout || this.defaultTimeout });
+    }
+
+    /**
+     * Assertions - Expect title to contain
+     */
+    async expectTitleToContain(text: string, timeout?: number): Promise<void> {
+        await expect(this.page).toHaveTitle(new RegExp(text), { timeout: timeout || this.defaultTimeout });
     }
 }
