@@ -1,10 +1,6 @@
 node_modules/
 .env
-test-results/
-playwright-report/
 @rerun.txt
-test-results/
-screenshots/
 videos/
 *.log
 .DS_Store
