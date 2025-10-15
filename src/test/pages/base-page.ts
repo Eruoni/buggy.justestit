@@ -714,4 +714,23 @@ export class BasePage {
     async expectTitleToContain(text: string, timeout?: number): Promise<void> {
         await expect(this.page).toHaveTitle(new RegExp(text), { timeout: timeout || this.defaultTimeout });
     }
+
+    /**
+     * Pause execution for specified seconds
+     */
+    async pauseInSec(sec: number): Promise<void> {
+        await this.wait(sec * 1000);
+    }
+
+    /**
+     * Generate random string
+     */
+    generateRandomString(length: number = 8, prefix?: string): string {
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return prefix ? `${prefix}${result}` : result;
+    }
 }

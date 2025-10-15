@@ -10,16 +10,17 @@ let modelContentPage: ModelContentPage;
 
 const timeout = browserManager.getdefaultTimeout();
 
-Given("User login as:", { timeout: timeout }, async function (table) {
-  const data = table.hashes()[0];
-  const username = data.Username;
-  const password = data.Password;
+Given("User logged in", { timeout: timeout }, async function () {
+  homePage = new HomePage(browserManager.getPage());
+  registerPage = new RegisterPage(browserManager.getPage());
 
+  // For demo purpose, we will randomly generate username and password
+  const username = await homePage.generateRandomString();
+  // For demo purpose, we will fix password here
+  const password = "Automation@123";
   let count = 0;
   do {
     count++;
-
-    homePage = new HomePage(browserManager.getPage());
     await homePage.login(username, password);
 
     const isLoggedIn = await homePage.isLoginSuccessful();
@@ -27,7 +28,6 @@ Given("User login as:", { timeout: timeout }, async function (table) {
     if (!isLoggedIn) {
       // Try registering
       await homePage.clickBtnRegister();
-      registerPage = new RegisterPage(browserManager.getPage());
       // Set automation default for first name and last name
       await registerPage.register(username, "Automation", "Test", password);
       await homePage.navigateToHomePage();
@@ -41,42 +41,58 @@ Given("User login as:", { timeout: timeout }, async function (table) {
   }
 });
 
-When("User comes to Popular Model from Home Page", { timeout: timeout }, async () => {
-  homePage = new HomePage(browserManager.getPage());
-  const popularModel = await homePage.getPopularModel();
-  await homePage.clickPopularModel();
+When(
+  "User comes to Popular Model from Home Page",
+  { timeout: timeout },
+  async () => {
+    homePage = new HomePage(browserManager.getPage());
+    const popularModel = await homePage.getPopularModel();
+    await homePage.clickPopularModel();
 
-  modelContentPage = new ModelContentPage(browserManager.getPage());
-  await modelContentPage.verifyNavigatedToCorrectModel(popularModel);
-});
+    modelContentPage = new ModelContentPage(browserManager.getPage());
+    await modelContentPage.verifyNavigatedToCorrectModel(popularModel);
+  }
+);
 
-When("User leaves a comment: {string}", { timeout: timeout }, async function (comment: string) {
-  modelContentPage = new ModelContentPage(browserManager.getPage());
-  await modelContentPage.addComment(comment);
-  this.userComment = comment;
-});
+When(
+  "User leaves a comment: {string}",
+  { timeout: timeout },
+  async function (comment: string) {
+    modelContentPage = new ModelContentPage(browserManager.getPage());
+    await modelContentPage.addComment(comment);
+    this.userComment = comment;
+  }
+);
 
 When("User vote for the car", { timeout: timeout }, async () => {
   modelContentPage = new ModelContentPage(browserManager.getPage());
   await modelContentPage.clickBtnVote();
 });
 
-Then("User should see comment added confirmation message", { timeout: timeout }, async () => {
-  modelContentPage = new ModelContentPage(browserManager.getPage());
-  await modelContentPage.verifyCommentAdded();
-});
+Then(
+  "User should see comment added confirmation message",
+  { timeout: timeout },
+  async () => {
+    modelContentPage = new ModelContentPage(browserManager.getPage());
+    await modelContentPage.verifyCommentAdded();
+  }
+);
 
-Then("User should see their comment displayed at the top of the Review table", { timeout: timeout }, async function () {
-  modelContentPage = new ModelContentPage(browserManager.getPage());
-  modelContentPage.verifyCommentOnTopOfReviewTable(this.userComment);
-});
+Then(
+  "User should see their comment displayed at the top of the Review table",
+  { timeout: timeout },
+  async function () {
+    modelContentPage = new ModelContentPage(browserManager.getPage());
+    modelContentPage.verifyCommentOnTopOfReviewTable(this.userComment);
+  }
+);
 
 When("User log out", async () => {
   homePage = new HomePage(browserManager.getPage());
-  await homePage.clickBtnLogout()
+  await homePage.clickBtnLogout();
 });
 
-Then('User should see login form displayed', { timeout: timeout }, async() => {
+Then("User should see login form displayed", { timeout: timeout }, async () => {
   homePage = new HomePage(browserManager.getPage());
-  await homePage.verifyLoginFormDisplayed()
-})
+  await homePage.verifyLoginFormDisplayed();
+});

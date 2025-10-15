@@ -14,128 +14,111 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 1118361799
+              "duration": 919627100
             }
           },
           {
-            "arguments": [
-              {
-                "rows": [
-                  {
-                    "cells": [
-                      "Username",
-                      "Password"
-                    ]
-                  },
-                  {
-                    "cells": [
-                      "automation_demo9",
-                      "Automation@123"
-                    ]
-                  }
-                ]
-              }
-            ],
+            "arguments": [],
             "keyword": "Given ",
             "line": 5,
-            "name": "User login as:",
+            "name": "User logged in",
             "match": {
               "location": "src\\test\\steps\\demo.steps.ts:13"
             },
             "result": {
               "status": "passed",
-              "duration": 10392528800
+              "duration": 9720806699
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 8,
+            "line": 6,
             "name": "User comes to Popular Model from Home Page",
             "match": {
               "location": "src\\test\\steps\\demo.steps.ts:44"
             },
             "result": {
               "status": "passed",
-              "duration": 5577073000
+              "duration": 4214493399
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
-            "line": 9,
+            "line": 7,
             "name": "User leaves a comment: \"Automation Comment\"",
             "match": {
-              "location": "src\\test\\steps\\demo.steps.ts:53"
+              "location": "src\\test\\steps\\demo.steps.ts:57"
             },
             "result": {
               "status": "passed",
-              "duration": 43193400
+              "duration": 21065500
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "User vote for the car",
+            "match": {
+              "location": "src\\test\\steps\\demo.steps.ts:67"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 94236899
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 9,
+            "name": "User should see comment added confirmation message",
+            "match": {
+              "location": "src\\test\\steps\\demo.steps.ts:72"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5861342599
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
             "line": 10,
-            "name": "User vote for the car",
-            "match": {
-              "location": "src\\test\\steps\\demo.steps.ts:59"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 161450699
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Then ",
-            "line": 11,
-            "name": "User should see comment added confirmation message",
-            "match": {
-              "location": "src\\test\\steps\\demo.steps.ts:64"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 6460899000
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 12,
             "name": "User should see their comment displayed at the top of the Review table",
             "match": {
-              "location": "src\\test\\steps\\demo.steps.ts:69"
+              "location": "src\\test\\steps\\demo.steps.ts:81"
             },
             "result": {
               "status": "passed",
-              "duration": 6321300
+              "duration": 4997900
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 13,
+            "line": 11,
             "name": "User log out",
             "match": {
-              "location": "src\\test\\steps\\demo.steps.ts:74"
+              "location": "src\\test\\steps\\demo.steps.ts:90"
             },
             "result": {
               "status": "passed",
-              "duration": 106354600
+              "duration": 63186800
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 14,
+            "line": 12,
             "name": "User should see login form displayed",
             "match": {
-              "location": "src\\test\\steps\\demo.steps.ts:79"
+              "location": "src\\test\\steps\\demo.steps.ts:95"
             },
             "result": {
               "status": "passed",
-              "duration": 27788199
+              "duration": 22140999
             }
           },
           {
@@ -143,7 +126,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 102268500
+              "duration": 96511099
             }
           }
         ],
